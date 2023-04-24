@@ -1,10 +1,11 @@
-package pw.ersms.accounts;
+package pw.ersms.accounts.account;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import pw.ersms.accounts.role.Role;
 
 import java.time.LocalDate;
 

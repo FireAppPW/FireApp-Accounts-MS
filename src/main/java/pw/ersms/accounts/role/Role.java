@@ -1,10 +1,11 @@
-package pw.ersms.accounts;
+package pw.ersms.accounts.role;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import pw.ersms.accounts.account.Account;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
