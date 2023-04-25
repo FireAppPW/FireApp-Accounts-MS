@@ -19,27 +19,26 @@ public class AccountController {
         return ResponseEntity.ok().body(accountService.get());
     }
 
-    @GetMapping(path = "{id}")
-    public ResponseEntity<Account> getAccountById(Integer id) {
-        return ResponseEntity.ok().body(accountService.get().get(id));
+    @GetMapping(path = "/{id}")
+    public ResponseEntity<Account> getAccountById(@PathVariable("id") Integer id) {
+        return ResponseEntity.ok().body(accountService.getAccountById(id));
     }
 
-    @DeleteMapping(path = "{id}")
-    public void deleteAccount(Integer id) {
+    @DeleteMapping(path = "/{id}")
+    public void deleteAccount(@PathVariable("id") Integer id) {
         accountService.deleteAccount(id);
     }
 
     @PostMapping
-    public void registerNewAccount(@RequestBody Account account) {
-        accountService.addNewAccount(account);
+    public ResponseEntity<Object> registerNewAccount(@RequestBody Account account) {
+        return ResponseEntity.ok().body(accountService.create(account));
     }
     
-    @PutMapping(path = "{id}")
-    public void updateAccount(
+    @PutMapping(path = "/{id}")
+    public ResponseEntity<Object> updateAccount(
             @PathVariable("id") Integer id,
             @RequestBody Account account) {
-        accountService.updateAccount(id, account);
+        return ResponseEntity.ok().body(accountService.updateAccount(id, account));
     }
-
 
 }

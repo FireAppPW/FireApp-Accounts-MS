@@ -4,11 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import pw.ersms.accounts.role.Role;
+import pw.ersms.accounts.role.RoleRepository;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -16,17 +15,36 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class AccountService {
     private final AccountRepository accountRepository;
+    private final RoleRepository roleRepository;
 
     public List<Account> get() {
         return accountRepository.findAll();
     }
 
-    public void addNewAccount(Account account) {
+    public Account getAccountById(Integer accountId) {
+        return accountRepository.findById(accountId)
+                .orElseThrow(() -> new IllegalStateException(
+                        "account with id " + accountId + " does not exist"
+                ));
+    }
+
+    public Object create(Account account) {
+        //check if email is taken
         Optional<Account> accountOptional = accountRepository.findAccountByEmail(account.getEmail());
         if (accountOptional.isPresent()) {
             throw new IllegalStateException("email taken");
         }
-        accountRepository.save(account);
+        //check if role exists
+        Optional<Role> roleOptional = roleRepository.findById(account.getRole().getId());
+
+        if (!roleOptional.isPresent()) {
+            throw new IllegalStateException("role does not exist");
+        }
+
+        //set role
+        account.setRole(roleOptional.get());
+
+        return accountRepository.save(account);
     }
 
     public void deleteAccount(Integer accountId) {
@@ -37,27 +55,33 @@ public class AccountService {
         accountRepository.deleteById(accountId);
     }
 
-    public void updateAccount(Integer accountId, Account account) {
+    public Object updateAccount(Integer accountId, Account account) {
         Account accountNew = accountRepository.findById(accountId)
                 .orElseThrow(() -> new IllegalStateException(
                         "account with id " + accountId + " does not exist"
                 ));
-        //for every field in account, if it is not null, set the corresponding field in the account with the id accountId to the value of the field in account
-        if(account.getEmail() != null && account.getEmail().length() > 0) {
-            accountNew.setEmail(account.getEmail());
-        }
-        if(account.getIsActivated() != null) {
-            accountNew.setIsActivated(account.getIsActivated());
-        }
-        if(account.getIsDeleted() != null) {
-            accountNew.setIsDeleted(account.getIsDeleted());
-        }
-        if(account.getAddressLine1() != null && account.getAddressLine1().length() > 0) {
-            accountNew.setAddressLine1(account.getAddressLine1());
+        //check if email is taken
+        Optional<Account> accountOptional = accountRepository.findAccountByEmail(account.getEmail());
+
+        if (accountOptional.isPresent() && !accountOptional.get().getId().equals(accountId)) {
+            throw new IllegalStateException("email taken");
         }
 
-        if(account.getAddressLine2() != null && account.getAddressLine2().length() > 0) {
-            accountNew.setAddressLine2(account.getAddressLine2());
+        //check if role exists
+        Optional<Role> roleOptional = roleRepository.findById(account.getRole().getId());
+
+        if (!roleOptional.isPresent()) {
+            throw new IllegalStateException("role does not exist");
         }
+
+        //set role
+        account.setRole(roleOptional.get());
+
+        //set id
+        account.setId(accountNew.getId());
+
+        return accountRepository.save(account);
+
+
     }
 }
