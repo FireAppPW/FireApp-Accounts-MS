@@ -43,17 +43,14 @@ public class Account {
     @Column(name = "fire_department_id", nullable = false)
     private Integer fireDepartmentId;
 
-    @Column(name = "fire_department_name", nullable = false, length = Integer.MAX_VALUE)
-    private String fireDepartmentName;
-
     @Column(name = "shift", nullable = false)
     private Integer shift;
 
     @Column(name = "\"position\"", nullable = false, length = Integer.MAX_VALUE)
     private String position;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "role_id", nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "role_id")
     private Role role;
 
     @Column(name = "address_line_1", nullable = false, length = Integer.MAX_VALUE)

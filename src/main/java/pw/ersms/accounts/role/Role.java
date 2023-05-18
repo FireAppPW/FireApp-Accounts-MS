@@ -33,6 +33,7 @@ public class Role {
     @Column(name = "name", nullable = false, length = Integer.MAX_VALUE)
     private String name;
 
+    @Transient
     @OneToMany(mappedBy = "role")
     private Set<Account> accounts = new LinkedHashSet<>();
 
