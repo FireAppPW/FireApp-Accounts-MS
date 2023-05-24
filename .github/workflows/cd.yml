@@ -39,4 +39,4 @@ jobs:
             sudo docker pull giangh14cqt/fireapp-be-account:latest
             sudo docker stop fireapp-be-account
             sudo docker rm fireapp-be-account
-            sudo docker run -d --name fireapp-be-account --network host --env-file .department_env giangh14cqt/fireapp-be-account:latest
+            sudo docker run -d --name fireapp-be-account --network host --env-file .account_env giangh14cqt/fireapp-be-account:latest
