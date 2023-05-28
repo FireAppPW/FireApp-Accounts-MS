@@ -82,6 +82,14 @@ public class AccountService {
 
         return accountRepository.save(account);
 
+    }
 
+    public Account findAccountByEmail(String email) {
+        Optional<Account> accountOptional = accountRepository.findAccountByEmail(email);
+        if (accountOptional.isPresent()) {
+            return accountOptional.get();
+        } else {
+            throw new IllegalStateException("account with email " + email + " does not exist");
+        }
     }
 }
