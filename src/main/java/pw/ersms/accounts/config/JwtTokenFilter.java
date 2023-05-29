@@ -1,11 +1,13 @@
 package pw.ersms.accounts.config;
 
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -43,7 +45,9 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         UserDetails userDetails = getUserDetails(token);
 
         UsernamePasswordAuthenticationToken
-                authentication = new UsernamePasswordAuthenticationToken(userDetails, null, null);
+                authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+
+        System.out.println("authentication: " + authentication);
 
         authentication.setDetails(
                 new WebAuthenticationDetailsSource().buildDetails(request));
@@ -53,10 +57,24 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
     private UserDetails getUserDetails(String token) {
 
-        String[] jwtSubject = jwtUtil.getSubject(token).split(",");
+        Claims claims = jwtUtil.parseClaims(token);
+        String subject = (String) claims.get(Claims.SUBJECT);
+        String role = (String) claims.get("roles");
+        System.out.println("roles: " + role);
 
-        UserDetails userDetails = new User(jwtSubject[1], "", new ArrayList<>());
+        System.out.println("roleNames: " + role);
 
+        ArrayList<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority(role));
+        String[] jwtSubject = subject.split(",");
+
+        System.out.println("email: " + jwtSubject[1]);
+
+        //userDetails.setId(Integer.parseInt(jwtSubject[0]));
+        //userDetails.setEmail(jwtSubject[1]);
+
+        UserDetails userDetails = new User(jwtSubject[1], "", authorities);
+        System.out.println("userDetails: " + userDetails);
         return userDetails;
     }
 

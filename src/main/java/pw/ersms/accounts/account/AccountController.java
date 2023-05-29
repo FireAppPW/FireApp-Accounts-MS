@@ -49,7 +49,7 @@ public class AccountController {
         return ResponseEntity.ok().body(accountService.create(account));
     }
     
-    @PutMapping(path = "register/{id}")
+    @PutMapping(path = "/{id}")
     public ResponseEntity<Object> updateAccount(
             @PathVariable("id") Integer id,
             @RequestBody Account account) {

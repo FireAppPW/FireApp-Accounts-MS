@@ -36,22 +36,12 @@ public class SecurityConfig{
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        /*
-        http
-                .authorizeHttpRequests((authz) -> authz
-                        .requestMatchers("/api/role/**").hasRole("ADMIN")
-                        .requestMatchers("/api/account/**").hasRole("USER")
-                        .requestMatchers("/api/**").permitAll()
-                        .anyRequest().authenticated()
-                )
-                .csrf().disable();
-        return http.build();
-         */
 
         //allow all requests (even if the user doesnt have credentials)
         http
                 .authorizeHttpRequests((authz) -> authz
                         .requestMatchers("/account/login/**").permitAll()
+                        .requestMatchers("/account/**").hasAnyAuthority("SysAdmin", "FireAdmin","User")
                         .anyRequest().authenticated()
                 )
                 .csrf().disable();

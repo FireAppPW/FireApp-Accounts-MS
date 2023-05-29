@@ -7,9 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import pw.ersms.accounts.account.Account;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 
 @Component
@@ -22,11 +20,12 @@ public class JwtTokenUtil {
     public String generateAccessToken(Account user) {
 
         //saving the user role in the token
-        //Map<String, Object> claims = new HashMap<>();
-        //claims.put("role", user.getRole().getName());
+        Set<String> claims = new HashSet<>();
+        claims.add(user.getRole().getName());
 
         return Jwts.builder()
                 .setSubject(String.format("%s,%s", user.getId(), user.getEmail()))
+                .claim("roles", user.getRole().getName())
                 .setIssuer("FireApp")
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRE_DURATION))
@@ -59,7 +58,7 @@ public class JwtTokenUtil {
         return parseClaims(token).getSubject();
     }
 
-    private Claims parseClaims(String token) {
+    Claims parseClaims(String token) {
         return Jwts.parser()
                 .setSigningKey(SECRET_KEY)
                 .parseClaimsJws(token)
