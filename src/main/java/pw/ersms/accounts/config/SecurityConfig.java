@@ -21,18 +21,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig{
 
-    @Autowired
-    private AccountRepository accountRepository;
-
     @Autowired private JwtTokenFilter jwtTokenFilter;
 
-
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(
-                email -> accountRepository.findAccountByEmail(email)
-                        .orElseThrow(
-                                () -> new UsernameNotFoundException("User with " + email + " not found.")));
-    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
