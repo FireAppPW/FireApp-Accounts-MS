@@ -1,5 +1,6 @@
 package pw.ersms.accounts.account;
 
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -11,13 +12,18 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
+import pw.ersms.accounts.config.AuthRequest;
 import pw.ersms.accounts.config.JwtTokenUtil;
 import pw.ersms.accounts.config.AuthResponse;
 import org.springframework.http.*;
 import org.springframework.security.authentication.*;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
 import java.security.Key;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -56,16 +62,35 @@ public class AccountController {
         return ResponseEntity.ok().body(accountService.updateAccount(id, account));
     }
 
-    @PostMapping("/login/{email}")
-    public ResponseEntity<AuthResponse> login(@PathVariable String email) {
+    @GetMapping("/login/{email}")
+    public ResponseEntity<AuthResponse> login(@PathVariable String email, @RequestBody AuthRequest authRequest) {
         try {
+            String url = "https://www.googleapis.com/oauth2/v3/userinfo";
+
+            //put the token in the authorization header
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(authRequest.getCode());
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+
+            //send the GET request, it will return a JSON response
+            ResponseEntity<String> responseFromGoogle = new RestTemplate().exchange(url, HttpMethod.GET, entity, String.class);
+
+            //get the user info
+            String userInfo = responseFromGoogle.getBody();
+
+            String emailFromGoogle = userInfo.substring(userInfo.indexOf("email") + 9, userInfo.indexOf("email_verified") - 6);
+
+            //check if the email from google is the same as the email from the request
+            if (!emailFromGoogle.equals(email)) {
+                System.out.println("Emails do not match");
+                System.out.println(emailFromGoogle + " " + email);
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
 
             Account user = accountService.findAccountByEmail(email);
-            System.out.println(user.getCity());
             String accessToken = jwtUtil.generateAccessToken(user);
-            System.out.println(accessToken);
-            AuthResponse response = new AuthResponse(user.getEmail(), accessToken);
-            System.out.println(response);
+            AuthResponse response = new AuthResponse();
+            response.setAccessToken(accessToken);
             return ResponseEntity.ok().body(response);
 
         } catch (BadCredentialsException ex) {
@@ -73,4 +98,6 @@ public class AccountController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
+
+
 }

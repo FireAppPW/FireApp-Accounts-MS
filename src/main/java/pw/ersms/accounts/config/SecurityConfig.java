@@ -32,7 +32,7 @@ public class SecurityConfig{
                 .authorizeHttpRequests((authz) -> authz
                         .requestMatchers("/account/login/**").permitAll()
                         .requestMatchers("/account/**").hasAnyAuthority("SysAdmin", "FireAdmin","User")
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 )
                 .csrf().disable();
         http.exceptionHandling()
