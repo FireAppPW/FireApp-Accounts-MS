@@ -1,0 +1,63 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    labels:
+        App: backend
+    name: account
+    namespace: default
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            App: backend
+    strategy:
+        type: RollingUpdate
+        rollingUpdate:
+            maxUnavailable: 50%
+            maxSurge: 50%
+    template:
+        metadata:
+            labels:
+                App: backend
+        spec:
+            containers:
+                - image: REPOSITORY_PREFIX_ENV.azurecr.io/fireapp-account-ms:lastest
+                  name: account
+                  imagePullPolicy: Always
+                  livenessProbe:
+                      httpGet:
+                          port: 8083
+                          path: /actuator/health/liveness
+                      initialDelaySeconds: 180
+                      periodSeconds: 30
+                  readinessProbe:
+                      httpGet:
+                          port: 8083
+                          path: /actuator/health/readiness
+                      initialDelaySeconds: 180
+                      periodSeconds: 30
+                  lifecycle:
+                      preStop:
+                          exec:
+                              command: ["sh", "-c", "sleep 10"]
+                  resources:
+                      requests:
+                          cpu: 100m
+                          memory: 256Mi
+                      limits:
+                          cpu: 300m
+                          memory: 1Gi
+                  env:
+                      - name: SPRING_PROFILES_ACTIVE
+                        value: kubernetes
+                      - name: DATASOURCE_PASSWORD
+                        value: DATASOURCE_PASSWORD_ENV
+                      - name: DATASOURCE_URL
+                        value: DATASOURCE_URL_ENV
+                      - name: DATASOURCE_USERNAME
+                        value: DATASOURCE_USERNAME_ENV
+                  ports:
+                      - containerPort: 8083
+            restartPolicy: Always
+status: {}
