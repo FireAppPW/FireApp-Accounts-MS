@@ -1,0 +1,42 @@
+name: Deploy project
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  Deploy:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      -
+        name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      -
+        name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          image: giangh14cqt/fireapp-be-account
+          push: true
+          #          platforms: linux/arm64/v8
+          tags: giangh14cqt/fireapp-be-account:latest
+      -
+        name: Trigger deployment
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          script: |
+            sudo docker pull giangh14cqt/fireapp-be-account:latest
+            sudo docker stop fireapp-be-account
+            sudo docker rm fireapp-be-account
+            sudo docker run -d --name fireapp-be-account --network host --env-file .account_env giangh14cqt/fireapp-be-account:latest
