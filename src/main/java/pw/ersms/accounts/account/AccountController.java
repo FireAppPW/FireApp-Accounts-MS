@@ -1,48 +1,30 @@
 package pw.ersms.accounts.account;
 
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
+import org.springframework.http.*;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import pw.ersms.accounts.config.AuthRequest;
-import pw.ersms.accounts.config.JwtTokenUtil;
 import pw.ersms.accounts.config.AuthResponse;
-import org.springframework.http.*;
-import org.springframework.security.authentication.*;
-
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.security.GeneralSecurityException;
-import java.security.Key;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import org.springframework.web.bind.annotation.*;
+import pw.ersms.accounts.config.JwtTokenUtil;
 
 import java.util.List;
 
 @RestController
 @AllArgsConstructor
 @RequestMapping("account")
+@SecurityRequirement(name = "Bearer Authentication")
 public class AccountController {
+    private static final Logger LOGGER = LoggerFactory.getLogger(JwtTokenUtil.class);
+    private final AccountService accountService;
     @Autowired
     JwtTokenUtil jwtUtil;
-    private final AccountService accountService;
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(JwtTokenUtil.class);
-
 
     @GetMapping
     public ResponseEntity<List<Account>> getAccount() {
