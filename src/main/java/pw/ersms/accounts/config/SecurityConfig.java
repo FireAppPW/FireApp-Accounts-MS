@@ -21,7 +21,7 @@ public class SecurityConfig {
 
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         //allow all requests (even if the user doesnt have credentials)
 
@@ -37,15 +37,10 @@ public class SecurityConfig {
                 })
                 .and()
                 .authorizeHttpRequests()
-//                .requestMatchers("/account/register",
-//                        "/account/verify**",
-//                        "/account/login",
-//                        "/swagger-ui/**",
-//                        "/v3/api-docs/**")
                 .requestMatchers("/*")
                 .permitAll()
-//                .anyRequest()
-//                .authenticated()
+                .anyRequest()
+                .authenticated()
                 .and()
 //                .authorizeHttpRequests((authz) -> authz
 //                        .requestMatchers("/account/login/**").permitAll()
@@ -57,17 +52,16 @@ public class SecurityConfig {
                 .and()
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
 
-        http.exceptionHandling()
-                .authenticationEntryPoint(
-                        (request, response, ex) -> {
-                            response.sendError(
-                                    HttpServletResponse.SC_UNAUTHORIZED,
-                                    ex.getMessage()
-                            );
-                        }
-                );
+//        http.exceptionHandling()
+//                .authenticationEntryPoint(
+//                        (request, response, ex) -> {
+//                            response.sendError(
+//                                    HttpServletResponse.SC_UNAUTHORIZED,
+//                                    ex.getMessage()
+//                            );
+//                        }
+//                );
 
-//        http.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
