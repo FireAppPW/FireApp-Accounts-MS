@@ -31,18 +31,15 @@ public class SecurityConfig {
 
         //allow all requests (even if the user doesnt have credentials)
 
+        http.cors(httpSecurityCorsConfigurer ->
+                httpSecurityCorsConfigurer.configurationSource(request ->
+                        new CorsConfiguration().applyPermitDefaultValues()
+                )
+        );
 
         http
                 .csrf()
                 .disable()
-//                .cors().configurationSource(c -> {
-//                    CorsConfiguration corsCfg = new CorsConfiguration();
-//                    corsCfg.applyPermitDefaultValues();
-//                    corsCfg.addAllowedOriginPattern("*");
-//                    corsCfg.addAllowedMethod(CorsConfiguration.ALL);
-//                    return corsCfg;
-//                })
-//                .and()
                 .authorizeHttpRequests((authz) -> authz
                         .requestMatchers("/account/login/**").permitAll()
                         .requestMatchers("/account/**").hasAnyAuthority("SysAdmin", "FireAdmin", "User")
