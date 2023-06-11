@@ -31,14 +31,14 @@ public class SecurityConfig {
         http
                 .csrf()
                 .disable()
-                .cors().configurationSource(c -> {
-                    CorsConfiguration corsCfg = new CorsConfiguration();
-                    corsCfg.applyPermitDefaultValues();
-                    corsCfg.addAllowedOriginPattern("*");
-                    corsCfg.addAllowedMethod(CorsConfiguration.ALL);
-                    return corsCfg;
-                })
-                .and()
+//                .cors().configurationSource(c -> {
+//                    CorsConfiguration corsCfg = new CorsConfiguration();
+//                    corsCfg.applyPermitDefaultValues();
+//                    corsCfg.addAllowedOriginPattern("*");
+//                    corsCfg.addAllowedMethod(CorsConfiguration.ALL);
+//                    return corsCfg;
+//                })
+//                .and()
                 .authorizeHttpRequests((authz) -> authz
                         .requestMatchers("/account/login/**").permitAll()
                         .requestMatchers("/account/**").hasAnyAuthority("SysAdmin", "FireAdmin", "User")
