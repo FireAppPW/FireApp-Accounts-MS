@@ -71,7 +71,7 @@ public class AccountController {
         return ResponseEntity.ok().body(accountService.updateAccount(id, account));
     }
 
-    @GetMapping("/login")
+    @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest authRequest) {
         try {
             String url = "https://www.googleapis.com/oauth2/v3/userinfo";
