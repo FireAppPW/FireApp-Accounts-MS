@@ -7,14 +7,14 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 @OpenAPIDefinition(
-		servers = {
-				@Server(url = "/", description = "Default Server URL")
-		}
+        servers = {
+                @Server(url = "/", description = "Default Server URL")
+        }
 )
 @SpringBootApplication
 public class AccountsApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(AccountsApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(AccountsApplication.class, args);
+    }
 }
