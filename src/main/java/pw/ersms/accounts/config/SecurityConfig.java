@@ -4,19 +4,24 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.ldap.EmbeddedLdapServerContextSourceFactoryBean;
+import org.springframework.security.config.ldap.LdapBindAuthenticationManagerFactory;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.SecurityFilterChain;
+import pw.ersms.accounts.account.AccountController;
+import pw.ersms.accounts.account.AccountRepository;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
 
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig {
+public class SecurityConfig{
 
-    @Autowired
-    private JwtTokenFilter jwtTokenFilter;
+    @Autowired private JwtTokenFilter jwtTokenFilter;
 
 
     @Bean
@@ -26,17 +31,10 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests((authz) -> authz
                         .requestMatchers("/account/login/**").permitAll()
-                        .requestMatchers("/account/**").hasAnyAuthority("SysAdmin", "FireAdmin", "User")
+                        .requestMatchers("/account/**").hasAnyAuthority("SysAdmin", "FireAdmin","User")
                         .anyRequest().permitAll()
                 )
-                .csrf().disable()
-                .cors().configurationSource(c -> {
-                    CorsConfiguration corsCfg = new CorsConfiguration();
-                    corsCfg.applyPermitDefaultValues();
-                    corsCfg.addAllowedOriginPattern("*");
-                    corsCfg.addAllowedMethod(CorsConfiguration.ALL);
-                    return corsCfg;
-                });
+                .csrf().disable();
         http.exceptionHandling()
                 .authenticationEntryPoint(
                         (request, response, ex) -> {
