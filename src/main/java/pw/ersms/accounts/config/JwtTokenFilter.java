@@ -47,8 +47,6 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         UsernamePasswordAuthenticationToken
                 authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
-        System.out.println("authentication: " + authentication);
-
         authentication.setDetails(
                 new WebAuthenticationDetailsSource().buildDetails(request));
 
@@ -60,21 +58,12 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         Claims claims = jwtUtil.parseClaims(token);
         String subject = (String) claims.get(Claims.SUBJECT);
         String role = (String) claims.get("roles");
-        System.out.println("roles: " + role);
-
-        System.out.println("roleNames: " + role);
 
         ArrayList<SimpleGrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority(role));
         String[] jwtSubject = subject.split(",");
 
-        System.out.println("email: " + jwtSubject[1]);
-
-        //userDetails.setId(Integer.parseInt(jwtSubject[0]));
-        //userDetails.setEmail(jwtSubject[1]);
-
         UserDetails userDetails = new User(jwtSubject[1], "", authorities);
-        System.out.println("userDetails: " + userDetails);
         return userDetails;
     }
 
@@ -92,7 +81,30 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             return;
         }
 
+        String departmentIdFromURL = extractDepartmentIdFromRequest(request);
+        String departmentIdFromToken = jwtUtil.getDepartmentIdFromToken(token);
+
+        if(departmentIdFromURL == null) {
+            setAuthenticationContext(token, request);
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        if (departmentIdFromToken == null || !departmentIdFromURL.equals(departmentIdFromToken)) {
+            System.out.println("Invalid departmentId");
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Invalid departmentId");
+            return;
+        }
+
         setAuthenticationContext(token, request);
         filterChain.doFilter(request, response);
+    }
+
+    private String extractDepartmentIdFromRequest(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        String[] pathParts = path.split("/");
+        // Assuming the departmentId is at index 2 in the pathParts array
+        // e.g. /account/departmentId/other/path/parts
+        return (pathParts.length > 2) ? pathParts[2] : null;
     }
 }
