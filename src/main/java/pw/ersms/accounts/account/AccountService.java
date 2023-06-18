@@ -17,6 +17,9 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final RoleRepository roleRepository;
 
+    public List<Account> get() {
+        return accountRepository.findAll();
+    }
     public List<Account> get(Integer departmentId) {
         return accountRepository.findAll().stream()
                 .filter(account -> account.getFireDepartmentId().equals(departmentId))
