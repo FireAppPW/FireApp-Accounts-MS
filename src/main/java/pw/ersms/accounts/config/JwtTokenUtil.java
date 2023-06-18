@@ -26,6 +26,7 @@ public class JwtTokenUtil {
         return Jwts.builder()
                 .setSubject(String.format("%s,%s", user.getId(), user.getEmail()))
                 .claim("roles", user.getRole().getName())
+                .claim("departmentId", user.getFireDepartmentId())
                 .setIssuer("FireApp")
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRE_DURATION))
@@ -63,5 +64,12 @@ public class JwtTokenUtil {
                 .setSigningKey(SECRET_KEY)
                 .parseClaimsJws(token)
                 .getBody();
+    }
+
+    public String getDepartmentIdFromToken(String token) {
+        Claims claims = Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
+        Integer departmentId = claims.get("departmentId", Integer.class);
+        //convert Integer to String
+        return String.valueOf(departmentId);
     }
 }

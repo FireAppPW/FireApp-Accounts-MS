@@ -33,6 +33,7 @@ public class SecurityConfig {
                     corsCfg.applyPermitDefaultValues();
                     corsCfg.addAllowedOriginPattern("*");
                     corsCfg.addAllowedMethod(CorsConfiguration.ALL);
+                    corsCfg.addAllowedHeader(CorsConfiguration.ALL);
                     return corsCfg;
                 })
                 .and()
@@ -41,14 +42,21 @@ public class SecurityConfig {
                         "/swagger-ui/**",
                         "/v3/api-docs/**")
                 .permitAll()
+                .requestMatchers(
+                        request -> request
+                                .getServletPath()
+                                .startsWith("/account/login")
+                )
+                .permitAll()
+                .requestMatchers(
+                        request -> request
+                                .getServletPath()
+                                .startsWith("/account")
+                )
+                .hasAnyAuthority("SysAdmin", "FireAdmin", "User")
                 .anyRequest()
                 .authenticated()
                 .and()
-//                .authorizeHttpRequests((authz) -> authz
-//                        .requestMatchers("/account/login/**").permitAll()
-//                        .requestMatchers("/account/**").hasAnyAuthority("SysAdmin", "FireAdmin", "User")
-//                        .anyRequest().permitAll()
-//                )
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()

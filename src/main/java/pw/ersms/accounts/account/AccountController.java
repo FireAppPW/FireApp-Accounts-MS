@@ -26,17 +26,17 @@ public class AccountController {
     @Autowired
     JwtTokenUtil jwtUtil;
 
-    @GetMapping
-    public ResponseEntity<List<Account>> getAccount() {
-        return ResponseEntity.ok().body(accountService.get());
+    @GetMapping(path = "/{departmentId}")
+    public ResponseEntity<List<Account>> getAccount(Integer departmentId) {
+        return ResponseEntity.ok().body(accountService.get(departmentId));
     }
 
-    @GetMapping(path = "/{id}")
+    @GetMapping(path = "/{departmentId}/{id}")
     public ResponseEntity<Account> getAccountById(@PathVariable("id") Integer id) {
         return ResponseEntity.ok().body(accountService.getAccountById(id));
     }
 
-    @DeleteMapping(path = "/{id}")
+    @DeleteMapping(path = "/{departmentId}/{id}")
     public void deleteAccount(@PathVariable("id") Integer id) {
         accountService.deleteAccount(id);
     }
@@ -46,7 +46,7 @@ public class AccountController {
         return ResponseEntity.ok().body(accountService.create(account));
     }
 
-    @PutMapping(path = "/{id}")
+    @PutMapping(path = "/{departmentId}/{id}")
     public ResponseEntity<Object> updateAccount(
             @PathVariable("id") Integer id,
             @RequestBody Account account) {
