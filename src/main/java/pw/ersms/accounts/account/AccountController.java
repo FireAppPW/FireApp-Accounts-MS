@@ -1,6 +1,8 @@
 package pw.ersms.accounts.account;
 
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwt;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
@@ -8,12 +10,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import pw.ersms.accounts.config.AuthRequest;
 import pw.ersms.accounts.config.AuthResponse;
 import pw.ersms.accounts.config.JwtTokenUtil;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -27,8 +33,33 @@ public class AccountController {
     JwtTokenUtil jwtUtil;
 
     @GetMapping
-    public ResponseEntity<List<Account>> getAccounts() {
-        return ResponseEntity.ok().body(accountService.get());
+    public ResponseEntity<List<Account>> getAccounts(Principal principal)  {
+
+        UserDetails userDetails = (UserDetails) ((UsernamePasswordAuthenticationToken) principal).getPrincipal();
+        //get first element of userDetails.getAuthorities()
+
+        //check if getAuthorities() returns a list of size 2
+        if (userDetails.getAuthorities().size() != 2) {
+            throw new BadCredentialsException("Invalid credentials");
+        }
+
+        //fireDepartmentId
+        System.out.println(userDetails.getAuthorities().toArray()[0]);
+        Integer fireDepartmentId = Integer.parseInt(userDetails.getAuthorities().toArray()[0].toString());
+
+        //role
+        System.out.println(userDetails.getAuthorities().toArray()[1]);
+        String role = userDetails.getAuthorities().toArray()[1].toString();
+
+        if(role.equals("SysAdmin")){
+            return ResponseEntity.ok().body(accountService.get());
+        }
+        else if(role.equals("FireAdmin")){
+            return ResponseEntity.ok().body(accountService.get(fireDepartmentId));
+        }else {
+            //return unauthorized
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
     }
 
     @GetMapping(path = "/{departmentId}")
