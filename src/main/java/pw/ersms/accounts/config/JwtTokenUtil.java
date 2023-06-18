@@ -27,6 +27,7 @@ public class JwtTokenUtil {
                 .setSubject(String.format("%s,%s", user.getId(), user.getEmail()))
                 .claim("roles", user.getRole().getName())
                 .claim("departmentId", user.getFireDepartmentId())
+                .claim("userId", user.getId())
                 .setIssuer("FireApp")
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRE_DURATION))
