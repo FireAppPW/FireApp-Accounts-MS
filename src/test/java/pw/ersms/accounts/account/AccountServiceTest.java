@@ -14,7 +14,6 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.apache.hc.core5.http2.ssl.ConscryptSupport.verify;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
