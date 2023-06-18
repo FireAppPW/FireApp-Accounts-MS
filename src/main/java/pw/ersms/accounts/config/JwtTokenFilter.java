@@ -18,6 +18,7 @@ import org.springframework.util.ObjectUtils;
 
 
 import java.io.IOException;
+import java.security.Principal;
 import java.util.ArrayList;
 
 @Component
@@ -43,6 +44,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
     private void setAuthenticationContext(String token, HttpServletRequest request) {
         UserDetails userDetails = getUserDetails(token);
+        String departmentId = jwtUtil.getDepartmentIdFromToken(token);
 
         UsernamePasswordAuthenticationToken
                 authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
@@ -58,9 +60,11 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         Claims claims = jwtUtil.parseClaims(token);
         String subject = (String) claims.get(Claims.SUBJECT);
         String role = (String) claims.get("roles");
+        String departmentId = jwtUtil.getDepartmentIdFromToken(token);
 
         ArrayList<SimpleGrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority(role));
+        authorities.add(new SimpleGrantedAuthority(departmentId));
         String[] jwtSubject = subject.split(",");
 
         UserDetails userDetails = new User(jwtSubject[1], "", authorities);
