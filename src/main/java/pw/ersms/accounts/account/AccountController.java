@@ -26,8 +26,13 @@ public class AccountController {
     @Autowired
     JwtTokenUtil jwtUtil;
 
+    @GetMapping
+    public ResponseEntity<List<Account>> getAccounts() {
+        return ResponseEntity.ok().body(accountService.get());
+    }
+
     @GetMapping(path = "/{departmentId}")
-    public ResponseEntity<List<Account>> getAccount(Integer departmentId) {
+    public ResponseEntity<List<Account>> getAccounts(@PathVariable("departmentId") Integer departmentId) {
         return ResponseEntity.ok().body(accountService.get(departmentId));
     }
 

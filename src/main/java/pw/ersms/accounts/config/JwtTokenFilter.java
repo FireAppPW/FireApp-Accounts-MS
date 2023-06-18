@@ -92,6 +92,8 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
         if (departmentIdFromToken == null || !departmentIdFromURL.equals(departmentIdFromToken)) {
             System.out.println("Invalid departmentId");
+            System.out.println("departmentIdFromURL: " + departmentIdFromURL);
+            System.out.println("departmentIdFromToken: " + departmentIdFromToken);
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Invalid departmentId");
             return;
         }
